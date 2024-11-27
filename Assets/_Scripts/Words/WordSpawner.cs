@@ -21,13 +21,16 @@ public class WordSpawner : MonoBehaviour
 
     public WordManager wordManager;
     public float wordDelay = 1.5f;
-    float nextWordTime;
     public SpellState currentSpellState = SpellState.Active;
 
-
-    public float spellTimer = 30f;
+    public float spellTimeMax; //total time for the player to type
+    public float spellTimer; //current time left
     public TextMeshProUGUI timerText;
     
+    private void Start() 
+    {
+        spellTimer = spellTimeMax;
+    }
 
     private void Update() 
     {
@@ -60,11 +63,10 @@ public class WordSpawner : MonoBehaviour
         
         currentSpellState = SpellState.Inactive;  // Stop word spawning
 
-        spellTimer = 30f; //reset timer
+        spellTimer = spellTimeMax; //reset timer
 
         // Calculate spell strength based on words typed
         int wordsTyped = wordManager.GetWordsTyped();
-        wordManager.spellStrengthCircle.SetActive(false);
 
         BattleSystem battleSystem = FindObjectOfType<BattleSystem>();
         battleSystem.ResolveSpellEffect(wordsTyped);

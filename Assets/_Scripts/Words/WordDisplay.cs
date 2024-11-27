@@ -10,19 +10,15 @@ public class WordDisplay : MonoBehaviour
     WordManager wordManager;
     WordSpawner wordSpawner;
 
-    public float shrinkSpeed = .25f;
+    public float shrinkSpeed = .25f; //chang shrink speed with difficulty 
     public float minScale = .25f;
-    private Vector3 originalScale;
 
 
     private void Start() 
     {
         wordManager = FindObjectOfType<WordManager>();
         wordSpawner = FindObjectOfType<WordSpawner>();
-
-        // Store the original scale of the object
-        originalScale = transform.localScale;
-        
+                
         // Start the shrinking process
         StartCoroutine(ShrinkCoroutine());
         
@@ -39,9 +35,9 @@ public class WordDisplay : MonoBehaviour
     public void RemoveWord()
     {           
         //remove from list
-
         //destroy
-        Destroy(gameObject);
+        if (gameObject != null)
+            Destroy(gameObject);
     }
 
     public void WordFailed()

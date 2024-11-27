@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -9,24 +10,33 @@ public class WordManager : MonoBehaviour
     bool hasActiveWord;
     Word activeWord;
     public WordSpawner wordSpawner;
-    public GameObject spellStrengthCircle;
-    float sizeChange = .2f;
 
-    //track the current spell
+
+
+    public IndicatorControl spellIndicator;
+    float sizeChange = .1f;
+
 
     public int wordsTyped;
+    public int mistakes;
+    public int wordsMissed;
+    Spell currentSpell;
 
 
-    public void AddWord()
+
+
+
+    public void AddWord(Spell spell)
     {
         if (wordSpawner.currentSpellState == SpellState.Active)
         {
-            Word word = new Word(WordGenerator.GetRandomWord(), wordSpawner.SpawnWord());
+            currentSpell = spell;
+            string randomWord = spell.GetRandomWord();
+            Word word = new Word(randomWord, wordSpawner.SpawnWord());
             words.Add(word);
         }
         
     }
-
 
 
     public void TypeLetter(char letter)
@@ -64,15 +74,16 @@ public class WordManager : MonoBehaviour
             hasActiveWord = false;
             words.Remove(activeWord); 
             wordsTyped++;
-            UpdateSpellStrengthIndicator(sizeChange*2);
-            AddWord();
+            spellIndicator.UpdateSize(sizeChange*2);
+            AddWord(currentSpell);
         }
         
     }
     public void ResetWordCount()
     {
         wordsTyped = 0; // Reset counter after the spell ends
-        ResetSpellIndicator(); // Reset circle size
+        spellIndicator.ResetSize(); // Reset circle size
+        
     }
     public int GetWordsTyped()
     {
@@ -91,32 +102,21 @@ public class WordManager : MonoBehaviour
         }
         
         hasActiveWord = false;
-        UpdateSpellStrengthIndicator(-sizeChange*2);
-        AddWord(); // Add a new word
+        spellIndicator.UpdateSize(-sizeChange*2);
+        wordsMissed++;
+        AddWord(currentSpell); // Add a new word
     }
 
-    void UpdateSpellStrengthIndicator(float scale)
-    {
-        if (spellStrengthCircle != null)
-        {
-            // Update the circle's scale in real time
-            spellStrengthCircle.transform.localScale += new Vector3(scale, scale, scale);
-        }
-    }
-    void ResetSpellIndicator()
-    {
-        spellStrengthCircle.transform.localScale = new Vector3(1, 1, 1);
-    }
 
     public void WrongKeyPressed()
     {
         //time penalty
-        wordSpawner.spellTimer -= .5f;
-        UpdateSpellStrengthIndicator(-sizeChange);
+        //wordSpawner.spellTimer -= .5f;
+        mistakes++;
+        spellIndicator.UpdateSize(-sizeChange);
         //flash screen red
         //reduce spell power
         
     }
-
 
 }

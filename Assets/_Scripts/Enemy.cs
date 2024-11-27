@@ -11,6 +11,11 @@ public class Enemy : MonoBehaviour
     public float currentHP;
     public HealthBar healthBar;
 
+    public bool shieldActive;
+    public float shieldStrength = 0f; // Percentage of damage to block (e.g., 0.5 for 50%)
+    public GameObject shieldPrefab;
+    public Transform shieldInstantiatePos;
+
     private void Start() 
     {
         healthBar = FindObjectOfType<HealthBar>();
@@ -18,13 +23,41 @@ public class Enemy : MonoBehaviour
 
     public bool TakeDamage(float damage)
     {
-        currentHP -= damage;
+        if(shieldActive)
+        {
+            //calc new damage value
+            int effectiveDamage = Mathf.RoundToInt(damage * (1f - shieldStrength)); // Reduce damage based on shield
+
+            //destroy active shield
+            shieldActive = false;
+            shieldStrength = 0f;
+            if(shieldPrefab != null)
+            {
+                Destroy(shieldPrefab);
+            }
+
+            //take damage
+            currentHP -= effectiveDamage;
+            
+        }
+        else
+        {
+            currentHP -= damage;
+        }
+
+        
         healthBar.SetHealth(currentHP);
         if(currentHP <= 0)
         {
             return true;
         }
         else return false;
+    }
+
+    public void GainSheild()
+    {
+        //instantiate shield icon
+        shieldPrefab = Instantiate(shieldPrefab, shieldInstantiatePos);
     }
 
 }
